@@ -57,27 +57,29 @@
 - В качестве бейзлайна используется модель `deepvk/RuModernBERT-base`.  
 - Датасет `ru-HNP` был адаптирован под формат AnglE: для каждого positive-примера добавлен случайный negative.  
 - Обучение запускается на кагле (P100) простой командой:
+- Сделан форк репозитория с небольшим фиксом
 
 ```bash
 !CUDA_VISIBLE_DEVICES=0 angle-trainer \
     --model_name_or_path deepvk/RuModernBERT-base \
-    --train_name_or_path Alexator26/ru-hnp-renamed-and-fixed-500k-v2 \
+    --train_name_or_path Alexator26/ru-hnp-renamed-and-fixed-500k-v3 \
     --train_split_name train \
-    --valid_name_or_path Alexator26/ru-hnp-renamed-and-fixed-500k-v2 \
+    --valid_name_or_path Alexator26/ru-hnp-renamed-and-fixed-500k-v3 \
     --valid_split_name validation \
-    \
+    --valid_name_or_path_for_callback Alexator26/eval-ru-sts-dataset \
+    --valid_split_name_for_callback train \
     --save_dir ./angle-rumodernbert-ru-hnp-output \
     --save_strategy steps \
-    --save_steps 500 \
+    --save_steps 200 \
     --save_total_limit 3 \
     \
     --eval_strategy steps \
-    --eval_steps 500 \
+    --eval_steps 200 \
     \
-    --logging_steps 500 \
+    --logging_steps 50 \
     --epochs 3 \
-    --batch_size 8 \
-    --gradient_accumulation_steps 8 \
+    --batch_size 4 \
+    --gradient_accumulation_steps 16 \
     --fp16 1 \
     --seed 42 \
     \
@@ -89,10 +91,22 @@
 ```
 
 
+## Метрики после первого тестового запуска
+
+![Метрика 1](./images/metric1.png)
+![Метрика 2](./images/metric2.png)
+![Метрика 3](./images/metric3.png)
+
+надо бы еще посчитать **ruMTEB**, но кажется, что пока рано
+
+[`Alexator26/eval-ru-sts-dataset`](https://huggingface.co/datasets/Alexator26/eval-ru-sts-dataset) — это validation сплит следующего датасета:  
+[`ai-forever/ru-stsbenchmark-sts`](https://huggingface.co/datasets/ai-forever/ru-stsbenchmark-sts)
+
+
 ## Ограничения по ресурсам
 
 Основное ограничение, с которым сталкивается команда — это дефицит вычислительных ресурсов. Обучение одной эпохи на модели `RuModernBERT-base` занимает около **5 часов** на GPU P100 в кагле, из за чего возникают сложности с проведением эксперементов.
 
 
-**Просим предоставить доступ к более мощным GPU (например, A100 или хотя бы V100)** — это позволило бы значительно ускорить эксперименты и добиться более качественного результата в рамках проекта.
+**Просим предоставить доступ к более мощным GPU (например, H100, A100 или хотя бы V100)** — это позволило бы значительно ускорить эксперименты и добиться более качественного результата в рамках проекта.
 
