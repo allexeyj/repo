@@ -86,6 +86,7 @@
     \
     --wandb_project angle-ru-hnp-experiments \
     --wandb_log_model false
+```
 
 
 ## Ограничения по ресурсам
