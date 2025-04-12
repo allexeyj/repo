@@ -97,9 +97,9 @@
 
 ## Метрики после первого тестового запуска
 
-![Метрика 1](./images/metric1.png)
-![Метрика 2](./images/metric2.png)
-![Метрика 3](./images/metric3.png)
+![train](./train-first-run.png)
+![val](./eval-first-run.png)
+
 
 надо бы еще посчитать **ruMTEB**, но кажется, что пока рано, после 2 этапа можно
 
