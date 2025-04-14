@@ -1,116 +1,76 @@
+
 # Text Embedders via Contrastive Learning
 
 ## Описание
-Этот проект представляет собой систему семантического поиска, основанную на дообучении sentence encoders с помощью методов контрастивного обучения. В качестве базовой модели используются энкодеры из коллекции [Sentence Encoders](https://huggingface.co/collections/deepvk/sentence-encoders-6667222a68458ec9acfea9fb) на Hugging Face.
+
+Проект посвящён созданию эмбеддера для русского языка на основе материалов из коллекции [Sentence Encoders](https://huggingface.co/collections/deepvk/sentence-encoders-6667222a68458ec9acfea9fb), с последующим применением в разных задачах(например, STS, Retrival, Classification).
 
 ## Участники команды
+
 - Куценко Дмитрий  
 - Самсанович Екатерина  
 - Шатурный Алексей  
 
-## Основные особенности
-- Контрастивное обучение модели для генерации текстовых эмбеддингов.  
-- Реализация полноценной системы семантического поиска.  
-- Поддержка дополнительных задач: кластеризация текстов, рекомендации, анализ тональности и др.
-
 ## Конкуренты и аналоги
-Проект носит учебный характер и не ориентирован на конкуренцию с коммерческими решениями. Схожие системы уже реализованы, примеры можно найти в [MTEB Leaderboard](https://huggingface.co/spaces/mteb/leaderboard).
+
+Проект носит учебный характер и не ставит цель конкурировать с промышленными решениями. Схожие системы уже существуют — см. [MTEB Leaderboard](https://huggingface.co/spaces/mteb/leaderboard).
 
 ## MVP (минимально жизнеспособный продукт)
-- Обученная модель и реализованная система семантического поиска.  
-- Оценка на стандартных бенчмарках.  
-- Сравнение с другими моделями эмбеддингов.
 
-## Функциональность
-Модель применима не только для поиска, но и для:
-- Кластеризации текстов.  
-- Систем рекомендаций.  
-- Поисковых чат-ботов по базе знаний.  
-- Анализа тональности, поиска дубликатов и других задач NLP.
+- Обученная модель эмбеддера.  
+- Семантический поиск по текстам.  
+- Оценка на стандартных бенчмарках(ruMTEB).  
+- Сравнение с другими эмбеддерами.
 
-## План действий
+## Решение
 
-Проект будет реализован поэтапно, с постепенным наращиванием функциональности и экспериментами с методами обучения:
+- В качестве базовой модели используется `deepvk/RuModernBERT-base`.  
+- Датасет `ru-HNP` был адаптирован под нужный формат: к каждому положительному примеру добавлен случайный отрицательный.  
+- Обучение ведётся с использованием contrastive learning и AnglE loss.
 
-1. **Бейзлайн**  
-   - Использовать метод **SimCSE** в качестве первого подхода для обучения sentence encoder.  
-   - Модель: `deepvk/RuModernBERT-base` с датасетом `deepvk/ru-HNP`.  
-   - Цель: получить базовую оценку качества модели на выбранных бенчмарках (например, ruMTEB\STS).
-2. **Расширение датасета**
-   -Основной упор на текущем этапе делается на обогащение обучающих данных за счет интеграции существующих разнообразных датасетов. Это рассматривается как наиболее быстрый и эффективный способ улучшить обобщающую способность модели. Генерация дополнительных данных с помощью LLM планируется как следующий шаг, если анализ результатов на ruMTEB покажет необходимость дальнейшего целенаправленного улучшения модели или устранения специфических слабых мест.
-
-3. **Генерация дополнительных данных**  
-   - С помощью LLMs постепенно генерировать дополнительные пары положительных/отрицательных примеров.  
-   - Обогащать датасет `ru-HNP` малыми батчами, контролируя качество новых примеров.  
-   - Повторное обучение модели на расширенном датасете и оценка улучшений.
-
-4. **Эксперименты с альтернативными методами Contrastive Learning**  
-   - После достижения удовлетворительного качества с SimCSE, протестировать альтернативные подходы.
-  
-
-
-## Методы Contrastive Learning и upd по SimCSE
-
-В рамках проекта рассматриваются различные подходы к контрастивному обучению.  
-Первоначально планировался метод **SimCSE** в качестве baseline, но от него отказались из-за сложности интеграции и неудобства работы с его реализацией.
-
-Вместо него используется [**AnglE**](https://github.com/SeanLee97/AnglE) — современная и гибкая реализация, удобная для обучения моделей на своих данных.
-
-## Текущий прогресс
-
-- В качестве бейзлайна используется модель `deepvk/RuModernBERT-base`.  
-- Датасет `ru-HNP` был адаптирован под формат AnglE: для каждого positive-примера добавлен случайный negative.  
-- Сделан форк репозитория с небольшим фиксом
-- Обучение запускается на кагле (P100) простой командой:
+### Запуск обучения
 
 ```bash
-!CUDA_VISIBLE_DEVICES=0 angle-trainer \
-    --model_name_or_path deepvk/RuModernBERT-base \
-    --train_name_or_path Alexator26/ru-hnp-renamed-and-fixed-500k-v3 \
-    --train_split_name train \
-    --valid_name_or_path Alexator26/ru-hnp-renamed-and-fixed-500k-v3 \
-    --valid_split_name validation \
-    --valid_name_or_path_for_callback Alexator26/eval-ru-sts-dataset \
-    --valid_split_name_for_callback train \
-    --save_dir ./angle-rumodernbert-ru-hnp-output \
-    --save_strategy steps \
-    --save_steps 200 \
-    --save_total_limit 3 \
-    \
-    --eval_strategy steps \
-    --eval_steps 200 \
-    \
-    --logging_steps 50 \
-    --epochs 3 \
-    --batch_size 4 \
-    --gradient_accumulation_steps 16 \
-    --fp16 1 \
-    --seed 42 \
-    \
-    --pooling_strategy cls \
-    --maxlen 512 \
-    \
-    --wandb_project angle-ru-hnp-experiments \
-    --wandb_log_model false
+CUDA_VISIBLE_DEVICES=0 angle-trainer \
+  --model_name_or_path deepvk/RuModernBERT-base \
+  --train_name_or_path Alexator26/ru-hnp-renamed-and-fixed-500k-v3 \
+  --train_split_name train \
+  --valid_name_or_path Alexator26/ru-hnp-renamed-and-fixed-500k-v3 \
+  --valid_split_name validation \
+  --valid_name_or_path_for_callback Alexator26/eval-ru-sts-dataset \
+  --valid_split_name_for_callback train \
+  --save_dir ./angle-rumodernbert-ru-hnp-output \
+  --save_strategy steps \
+  --save_steps 200 \
+  --save_total_limit 3 \
+  \
+  --eval_strategy steps \
+  --eval_steps 200 \
+  \
+  --logging_steps 50 \
+  --epochs 3 \
+  --batch_size 4 \
+  --gradient_accumulation_steps 16 \
+  --fp16 1 \
+  --seed 42 \
+  \
+  --pooling_strategy cls \
+  --maxlen 512 \
+  \
+  --wandb_project angle-ru-hnp-experiments \
+  --wandb_log_model false
 ```
 
+## Метрики на ruMTEB
+zero-shot - 100%, т.е без дообучения на трейн сплитах бенчмарков
 
-## Метрики после первого тестового запуска
+![ruMTEB](./ru-mteb.png)
 
-![train](./train-first-run.png)
-![val](./eval-first-run.png)
-
-
-надо бы еще посчитать **ruMTEB**, но кажется, что пока рано, после 2 этапа можно
-
-[`Alexator26/eval-ru-sts-dataset`](https://huggingface.co/datasets/Alexator26/eval-ru-sts-dataset) — это validation сплит следующего датасета:  
-[`ai-forever/ru-stsbenchmark-sts`](https://huggingface.co/datasets/ai-forever/ru-stsbenchmark-sts)
+Метрики по задачам `MIRACLReranking`, `MIRACLRetrieval`, `MassiveIntentClassification`, `MassiveScenarioClassification`, `TERRa` не учитывались — их не оценивали.
 
 
 ## Ограничения по ресурсам
 
-Основное ограничение, с которым сталкивается команда — это дефицит вычислительных ресурсов. Обучение одной эпохи на модели `RuModernBERT-base` занимает около **5 часов** на GPU P100 в кагле, из за чего возникают сложности с проведением эксперементов.
+Проект максимально использует доступные ресурсы — обучение проводится на бесплатной GPU-сессии Kaggle, которая ограничена 12 часами. Уже сейчас обучение едва помещается в этот лимит, и дальнейшие эксперименты проводить сложно.
 
-
-**Просим предоставить доступ к более мощным GPU (например, H100, A100 или хотя бы V100)** — это позволило бы значительно ускорить эксперименты и добиться более качественного результата в рамках проекта.
-
+Например, мы не можем добавить даже относительно компактный(около 580к триплетов) датасет [all-nli](https://huggingface.co/datasets/sentence-transformers/all-nli) в трейн. Нет ресурсов на перевод датасета на русский и последующее обучение. **Без дополнительных ресурсов вряд-ли получится сильно учучшить результат**
