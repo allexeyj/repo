@@ -1,0 +1,26 @@
+defaults:
+  - model: base
+  - dataset: triplets
+  - _self_
+
+seed: 42
+device: ${env:DEVICE,cuda}
+
+batch:
+  batch_size: 8
+  num_hard_negs: 5
+  ref_size: 128
+
+training:
+  epochs: 2
+  lr: 1e-5
+  weight_decay: 0.01
+  temperature: 0.02
+
+wandb:
+  project: ru-en-embedder-finetune
+  api_key: ${env:WANDB_API_KEY}
+  use_wandb: true
+
+hf:
+  token: ${env:HF_TOKEN}
