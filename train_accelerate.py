@@ -4,7 +4,7 @@ import torch
 from accelerate import Accelerator
 from accelerate.utils import set_seed
 import hydra
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 
 from src.utils.data_utils import get_dataloaders
 from src.utils.model_utils import build_tokenizer_and_model, get_optim_and_scheduler
