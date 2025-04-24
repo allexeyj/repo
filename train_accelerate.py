@@ -3,6 +3,8 @@ import torch
 
 from accelerate import Accelerator
 from accelerate.utils import set_seed
+from accelerate import DeepSpeedPlugin
+
 import hydra
 from omegaconf import DictConfig, OmegaConf
 
@@ -22,11 +24,14 @@ def main(cfg: DictConfig):
     os.environ["WANDB_PROJECT"] = cfg.wandb.project  # задаём проект для WandB
 
     # ─── 1) Создаём Accelerator с интеграцией WandB
+    deepspeed_plugin = DeepSpeedPlugin(config_file="configs/accelerate/default_config.yaml")
+
     accelerator = Accelerator(
-        gradient_accumulation_steps=1,
-        mixed_precision=None,
-        log_with="wandb",          # только строкой
+        gradient_accumulation_steps=cfg.accelerate.deepspeed_config.gradient_accumulation_steps,
+        mixed_precision=cfg.accelerate.mixed_precision,
+        log_with="wandb",
         project_dir=cfg.training.output_dir,
+        deepspeed_plugin=deepspeed_plugin,
     )
 
     # ─── 1.1) Инициализируем трекеры (имя run, параметры эксперимента)

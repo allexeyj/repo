@@ -1,6 +1,7 @@
 defaults:
-  - model: base
-  - dataset: triplets
+  - model: small
+  - dataset: triplets_3M
+  - accelerate: default_config
   - _self_
 
 seed: 42
