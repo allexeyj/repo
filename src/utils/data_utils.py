@@ -25,7 +25,6 @@ def get_dataloaders(cfg, tokenizer):
     else:
         full = load_from_disk(path)['train']
 
-    full = full.class_encode_column("dataset_name")
     splits = full.train_test_split(
         test_size=cfg.dataset.test_size,
         stratify_by_column="dataset_name",
