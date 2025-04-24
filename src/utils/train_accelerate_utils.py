@@ -44,7 +44,7 @@ def train_epoch_accelerate(accelerator, model, train_dl, optim, scheduler, memor
             accelerator.log({"train_loss": loss.item()}, step=current_step)
 
 
-        if accelerator.is_main_process and cfg.training.ckpt_steps and current_step % cfg.training.ckpt_steps == 0:
+        if accelerator.is_main_process and cfg.training.ckpt_steps and current_step % cfg.training.ckpt_steps == 0 and current_step >= cfg.training.ckpt_steps:
             ckpt_base = cfg.training.output_dir
             os.makedirs(ckpt_base, exist_ok=True)
             for d in os.listdir(ckpt_base):
