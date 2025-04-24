@@ -46,10 +46,12 @@ def main(cfg: DictConfig):
     total_steps = cfg.training.epochs * len(train_dl)
     optim, scheduler = get_optim_and_scheduler(cfg, model, total_steps)
 
-    # ─── 7) Cross-Batch-Memory (глобальный размер очереди = ref_size – batch*(1+negs) на все процессы)
-    global_batch = cfg.batch.batch_size * (1 + cfg.batch.num_hard_negs) * accelerator.num_processes
-    queue_size = max(0, cfg.batch.ref_size - global_batch) * accelerator.num_processes
-    memory = CrossBatchMemory(queue_size, cfg.model.hidden_dim, accelerator.device)
+    # ─── 7) Cross-Batch-Memory
+    # ref_size = 1 (позитив) + N_batch_negs + N_queue_negs; ref_size - имитируемый батч
+    num_batch_negs = cfg.batch.batch_size * cfg.batch.num_hard_negs
+    queue_size = max(0, cfg.batch.ref_size - 1 - num_batch_negs)
+    accelerator.print(f"INFO: CrossBatchMemory queue size per process = {queue_size}")
+    memory = CrossBatchMemory(int(queue_size), cfg.model.hidden_dim, accelerator.device)
 
     # ─── 8) Регистрируем stateful-объекты для корректного сохранения/загрузки
     accelerator.register_state(sampler=train_dl.batch_sampler, memory=memory)

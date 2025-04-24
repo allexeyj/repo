@@ -1,14 +1,12 @@
 from typing import List
-import torch
 from transformers import PreTrainedTokenizer
 
 class TripletCollator:
     """Преобразует batch из triplet-примеров в токены для (q, pos, negs...)."""
 
-    def __init__(self, tokenizer: PreTrainedTokenizer, max_len: int, device: str):
+    def __init__(self, tokenizer: PreTrainedTokenizer, max_len: int):
         self.tok = tokenizer
         self.max_len = max_len
-        self.dev = device
 
     def __call__(self, batch: List[dict]) -> dict:
         texts: List[str] = []
@@ -23,4 +21,5 @@ class TripletCollator:
             max_length=self.max_len,
             return_tensors="pt",
         )
-        return {k: v.to(self.dev) for k, v in enc.items()}
+        # Отдаём на CPU, Accelerator перенесёт на GPU при prepare()
+        return enc

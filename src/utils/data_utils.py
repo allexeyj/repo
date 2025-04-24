@@ -24,7 +24,7 @@ def get_dataloaders(cfg, tokenizer):
     )
     train_ds, val_ds = splits["train"], splits["test"]
 
-    collator = TripletCollator(tokenizer, cfg.model.max_len, cfg.device)
+    collator = TripletCollator(tokenizer, cfg.model.max_len)
     train_ids = train_ds["dataset_name"]
     sampler = StratifiedBatchSampler(train_ids, cfg.batch.batch_size, drop_last=False)
 
