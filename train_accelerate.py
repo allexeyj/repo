@@ -18,16 +18,23 @@ def main(cfg: DictConfig):
     os.environ["PYTHONHASHSEED"] = str(cfg.seed)
     os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
 
+    # ─── Настройка WandB через Accelerate
+    os.environ["WANDB_PROJECT"] = cfg.wandb.project  # задаём проект для WandB
+
     # ─── 1) Создаём Accelerator с интеграцией WandB
     accelerator = Accelerator(
         gradient_accumulation_steps=1,
-        mixed_precision=None,  # None → берётся из accelerate/default_config.yaml
-        log_with={"wandb": {"project": cfg.wandb.project}},
+        mixed_precision=None,
+        log_with="wandb",          # только строкой
         project_dir=cfg.training.output_dir,
     )
-    # ─── 1.1) Инициализируем трекеры WandB через Accelerate
+
+    # ─── 1.1) Инициализируем трекеры (имя run, параметры эксперимента)
     if accelerator.is_main_process:
-        accelerator.init_trackers("run", config=OmegaConf.to_container(cfg, resolve=False))
+        accelerator.init_trackers(
+            project_name="run_" + str(os.getpid()),  # уникальное имя запуска
+            config=OmegaConf.to_container(cfg, resolve=False)
+        )
 
     # ─── 2) Сиды и детерминизм
     set_seed(cfg.seed, device_specific=True)
