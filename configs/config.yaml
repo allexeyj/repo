@@ -21,7 +21,7 @@ training:
 
 wandb:
   project: ru-en-embedder-finetune
-  api_key: null
+  api_key: null #если есть ключ, ставится в os.environ, если же null, предпологается, что уже стоит в os.environ
   use_wandb: true
 
 resume_from: null    # <-- путь к папке с state-00000X, например "checkpoints/step_2000"
