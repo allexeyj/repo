@@ -72,8 +72,8 @@ def main(cfg: DictConfig):
             accelerator, model, val_dl, cfg, epoch
         )
 
-    if accelerator.is_main_process:
-        print(f"Epoch {epoch}: train_loss={train_loss:.4f}, val_loss={val_loss:.4f}")
+        if accelerator.is_main_process:
+            print(f"Epoch {epoch}: train_loss={train_loss:.4f}, val_loss={val_loss:.4f}")
 
 
 if __name__ == "__main__":
