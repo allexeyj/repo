@@ -29,7 +29,7 @@ def main(cfg: DictConfig):
 
     # ─── 1) Создаём Accelerator с интеграцией WandB
     ds_config = os.path.join(get_original_cwd(), "configs/accelerate/default_config.yaml")
-    deepspeed_plugin = DeepSpeedPlugin(config_file=ds_config)
+    deepspeed_plugin = DeepSpeedPlugin(hf_ds_config=ds_config)
 
     accelerator = Accelerator(
         gradient_accumulation_steps=cfg.accelerate.deepspeed_config.gradient_accumulation_steps,
