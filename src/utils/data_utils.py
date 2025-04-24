@@ -23,7 +23,7 @@ def get_dataloaders(cfg, tokenizer):
     if name:
         full = load_dataset(name, split="train")
     else:
-        full = load_from_disk(path, keep_in_memory=True)['train'] #так как может быть read only
+        full = load_from_disk(path)['train'] #так как может быть read only
 
     full = full.class_encode_column("dataset_name")
     splits = full.train_test_split(
