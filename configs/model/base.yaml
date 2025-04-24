@@ -1,4 +1,4 @@
-_model_: deepvk/USER2-base
+_model_: deepvk/USER2-small
 revision: weakly_sft
 max_len: 1024
-hidden_dim: 768
+hidden_dim: 384
