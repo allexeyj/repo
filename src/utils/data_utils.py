@@ -44,20 +44,16 @@ def get_dataloaders(cfg, tokenizer):
         train_ds,
         batch_sampler=sampler,
         collate_fn=collator,
-        num_workers=4,
         worker_init_fn=seed_worker,
         generator=g,
-        persistent_workers=True,
     )
     val_dl = DataLoader(
         val_ds,
         batch_size=cfg.batch.batch_size,
         shuffle=False,
         collate_fn=collator,
-        num_workers=2,
         worker_init_fn=seed_worker,
         generator=g,
-        persistent_workers=True,
     )
 
     return train_dl, val_dl
