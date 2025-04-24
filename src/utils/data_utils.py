@@ -1,4 +1,4 @@
-from datasets import load_dataset
+from datasets import load_dataset, load_from_disk
 from torch.utils.data import DataLoader
 import random
 import numpy as np
@@ -15,7 +15,15 @@ def seed_worker(worker_id: int):
 
 
 def get_dataloaders(cfg, tokenizer):
-    full = load_dataset(cfg.dataset.dataset_name, split="train")
+    # Загрузка датасета: либо по имени на HF Hub, либо из локальной папки
+    name = cfg.dataset.get("dataset_name")
+    path = cfg.dataset.get("dataset_path")
+    if (name and path) or (not name and not path):
+        raise ValueError("Необходимо указать ровно одно из 'dataset_name' или 'dataset_path' в конфиге.")
+    if name:
+        full = load_dataset(name, split="train")
+    else:
+        full = load_from_disk(path, split="train")
     full = full.class_encode_column("dataset_name")
     splits = full.train_test_split(
         test_size=cfg.dataset.test_size,
