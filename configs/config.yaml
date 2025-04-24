@@ -30,7 +30,3 @@ resume_from: null    # <-- путь к папке с state-00000X, наприм�
 hydra:
   run:
     dir: .
-
-hf:
-  token: null
-  use_hf: true
