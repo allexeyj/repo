@@ -23,7 +23,7 @@ def main(cfg: DictConfig):
         gradient_accumulation_steps=1,
         mixed_precision=None,  # None → берётся из accelerate/default_config.yaml
         log_with={"wandb": {"project": cfg.wandb.project}},
-        logging_dir=cfg.training.output_dir,
+        project_dir=cfg.training.output_dir,
     )
     # ─── 1.1) Инициализируем трекеры WandB через Accelerate
     if accelerator.is_main_process:
