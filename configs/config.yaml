@@ -32,4 +32,5 @@ hydra:
     dir: .
 
 hf:
-  token: ${env:HF_TOKEN}
+  token: null
+  use_hf: true
