@@ -16,11 +16,23 @@ training:
   lr: 1e-5
   weight_decay: 0.01
   temperature: 0.02
+  ckpt_steps: 2000
+  output_dir: checkpoints
 
 wandb:
   project: ru-en-embedder-finetune
   api_key: ${env:WANDB_API_KEY}
   use_wandb: true
+
+resume_from: null    # <-- путь к папке с state-00000X, например "checkpoints/step_2000"
+
+# чтобы Hydra не создавал вложенные папки, а сохранял в cwd:
+hydra:
+  run:
+    dir: .
+
+
+
 
 hf:
   token: ${env:HF_TOKEN}

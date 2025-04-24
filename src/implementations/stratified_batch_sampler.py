@@ -63,3 +63,13 @@ class StratifiedBatchSampler(Sampler[List[int]]):
         # Можно определить как total_samples // batch_size
         total = sum(len(v) for v in self.groups.values())
         return total // self.batch_size
+
+    def state_dict(self):
+        return {
+            "buffers": self.buffers,
+            "rng_state": random.getstate(),
+        }
+
+    def load_state_dict(self, state):
+        self.buffers = state["buffers"]
+        random.setstate(state["rng_state"])
