@@ -5,7 +5,6 @@ import random
 
 from accelerate import Accelerator
 from accelerate.utils import set_seed
-from accelerate import DeepSpeedPlugin
 from accelerate import DataLoaderConfiguration
 
 import hydra
@@ -28,15 +27,12 @@ def main(cfg: DictConfig):
     os.environ["WANDB_PROJECT"] = cfg.wandb.project  # задаём проект для WandB
 
     # ─── 1) Создаём Accelerator с интеграцией WandB
-    ds_config = os.path.join(get_original_cwd(), "configs/accelerate/default_config.yaml")
-    deepspeed_plugin = DeepSpeedPlugin(hf_ds_config=ds_config)
 
     accelerator = Accelerator(
         gradient_accumulation_steps=cfg.accelerate.deepspeed_config.gradient_accumulation_steps,
         mixed_precision=cfg.accelerate.mixed_precision,
         log_with="wandb",
         project_dir=cfg.training.output_dir,
-        deepspeed_plugin=deepspeed_plugin,
         dataloader_config=DataLoaderConfiguration(split_batches=True, dispatch_batches=True)
     )
 
