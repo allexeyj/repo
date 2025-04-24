@@ -32,7 +32,7 @@ def main(cfg: DictConfig):
     # ─── 1.1) Инициализируем трекеры (имя run, параметры эксперимента)
     if accelerator.is_main_process:
         accelerator.init_trackers(
-            project_name="run_" + str(os.getpid()),  # уникальное имя запуска
+            project_name=cfg.wandb.project,  # уникальное имя запуска
             config=OmegaConf.to_container(cfg, resolve=False)
         )
 
