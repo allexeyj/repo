@@ -45,6 +45,8 @@ def train_epoch_accelerate(accelerator, model, train_dl, optim, scheduler, memor
 
 
         if accelerator.is_main_process and cfg.training.ckpt_steps and current_step % cfg.training.ckpt_steps == 0 and current_step >= cfg.training.ckpt_steps:
+            # дождаться, чтобы все rank-ы были на одном шаге
+            accelerator.wait_for_everyone()
             ckpt_base = cfg.training.output_dir
             os.makedirs(ckpt_base, exist_ok=True)
             for d in os.listdir(ckpt_base):
@@ -53,7 +55,7 @@ def train_epoch_accelerate(accelerator, model, train_dl, optim, scheduler, memor
                     shutil.rmtree(path, ignore_errors=True)
             accelerator.save_state(os.path.join(ckpt_base, f"step_{current_step}"))
 
-
+    accelerator.wait_for_everyone()
     if accelerator.is_main_process:
         unwrapped_model = accelerator.unwrap_model(model)
         unwrapped_model.save_pretrained(

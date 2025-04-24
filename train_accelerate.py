@@ -1,9 +1,12 @@
 import os
 import torch
+from hydra.utils import get_original_cwd
+import random
 
 from accelerate import Accelerator
 from accelerate.utils import set_seed
 from accelerate import DeepSpeedPlugin
+from accelerate import DataLoaderConfiguration
 
 import hydra
 from omegaconf import DictConfig, OmegaConf
@@ -19,12 +22,14 @@ def main(cfg: DictConfig):
     # ─── 0) До всякой инициализации torch — фиксируем hash-seed и cublas workspace
     os.environ["PYTHONHASHSEED"] = str(cfg.seed)
     os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
+    random.seed(cfg.seed)
 
     # ─── Настройка WandB через Accelerate
     os.environ["WANDB_PROJECT"] = cfg.wandb.project  # задаём проект для WandB
 
     # ─── 1) Создаём Accelerator с интеграцией WandB
-    deepspeed_plugin = DeepSpeedPlugin(config_file="configs/accelerate/default_config.yaml")
+    ds_config = os.path.join(get_original_cwd(), "configs/accelerate/default_config.yaml")
+    deepspeed_plugin = DeepSpeedPlugin(config_file=ds_config)
 
     accelerator = Accelerator(
         gradient_accumulation_steps=cfg.accelerate.deepspeed_config.gradient_accumulation_steps,
@@ -32,6 +37,7 @@ def main(cfg: DictConfig):
         log_with="wandb",
         project_dir=cfg.training.output_dir,
         deepspeed_plugin=deepspeed_plugin,
+        dataloader_config=DataLoaderConfiguration(split_batches=True, dispatch_batches=True)
     )
 
     # ─── 1.1) Инициализируем трекеры (имя run, параметры эксперимента)
