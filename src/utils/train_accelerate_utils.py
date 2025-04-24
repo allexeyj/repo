@@ -41,7 +41,7 @@ def train_epoch_accelerate(accelerator, model, train_dl, optim, scheduler, memor
         current_step = base_step + step
 
         if cfg.wandb.use_wandb and accelerator.is_main_process:
-            accelerator.log({"train_loss": loss.item()}, step=current_step)
+            wandb.log({"train_loss": loss.item()}, step=current_step)
 
 
         if accelerator.is_main_process and cfg.training.ckpt_steps and current_step % cfg.training.ckpt_steps == 0:
@@ -90,5 +90,5 @@ def validate_epoch_accelerate(accelerator, model, val_dl, cfg, epoch_idx):
 
     avg_loss = val_loss / len(val_dl)
     if cfg.wandb.use_wandb and accelerator.is_main_process:
-        accelerator.log({"val_loss": avg_loss}, step=epoch_idx)
+        wandb.log({"val_loss": avg_loss}, step=epoch_idx)
     return avg_loss
