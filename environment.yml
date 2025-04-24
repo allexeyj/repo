@@ -1,0 +1,20 @@
+name: ru-en-embedder
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - cudatoolkit=12.1        # для GPU-версии PyTorch
+  # сам PyTorch берём из conda (совместимо с cudatoolkit)
+  - pytorch
+  # остальное через pip
+  - pip:
+    - datasets
+    - hydra-core
+    - numpy
+    - omegaconf
+    - tqdm
+    - transformers
+    - wandb
+    - accelerate[deepspeed]
