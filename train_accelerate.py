@@ -23,14 +23,9 @@ def main(cfg: DictConfig):
     os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
     random.seed(cfg.seed)
 
-    # ─── Настройка WandB через Accelerate
-    os.environ["WANDB_PROJECT"] = cfg.wandb.project  # задаём проект для WandB
-
     # ─── 1) Создаём Accelerator с интеграцией WandB
 
     accelerator = Accelerator(
-        gradient_accumulation_steps=cfg.accelerate.deepspeed_config.gradient_accumulation_steps,
-        mixed_precision=cfg.accelerate.mixed_precision,
         log_with="wandb",
         project_dir=cfg.training.output_dir,
         dataloader_config=DataLoaderConfiguration(split_batches=True, dispatch_batches=True)
