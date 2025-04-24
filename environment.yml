@@ -3,9 +3,9 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.10
+  - python=3.11
   - pip
-  - cudatoolkit=12.1        # для GPU-версии PyTorch
+  - cudatoolkit        # для GPU-версии PyTorch
   # сам PyTorch берём из conda (совместимо с cudatoolkit)
   - pytorch
   # остальное через pip
