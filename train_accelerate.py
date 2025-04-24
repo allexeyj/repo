@@ -23,7 +23,8 @@ def main(cfg: DictConfig):
     accelerator = Accelerator(
         gradient_accumulation_steps=1,
         mixed_precision=None,  # None → возьмётся из вашего accelerate/default_config.yaml
-        log_with="wandb"  # логируем в W&B
+        log_with="wandb",
+        project_dir=cfg.training.output_dir
     )
 
     # ─── 2) Сиды и детерминизм
@@ -54,7 +55,8 @@ def main(cfg: DictConfig):
     memory = CrossBatchMemory(int(queue_size), cfg.model.hidden_dim, accelerator.device)
 
     # ─── 8) Регистрируем stateful-объекты для корректного сохранения/загрузки
-    accelerator.register_state(sampler=train_dl.batch_sampler, memory=memory)
+    accelerator.register_for_checkpointing(train_dl.batch_sampler)
+    accelerator.register_for_checkpointing(memory)
 
     # ─── 9) Готовим всё к распараллеливанию
     model, optim, train_dl, val_dl, scheduler = accelerator.prepare(
