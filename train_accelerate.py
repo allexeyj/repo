@@ -4,7 +4,6 @@ from hydra.utils import get_original_cwd
 import random
 
 from accelerate import Accelerator
-from accelerate.utils import set_seed
 from accelerate import DataLoaderConfiguration
 
 import hydra
