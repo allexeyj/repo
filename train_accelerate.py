@@ -2,6 +2,7 @@ import os
 import torch
 from hydra.utils import get_original_cwd
 import random
+import numpy as np
 
 from accelerate import Accelerator
 from accelerate import DataLoaderConfiguration
