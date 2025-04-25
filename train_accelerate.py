@@ -82,5 +82,5 @@ def main(cfg: DictConfig):
 
 
 if __name__ == "__main__":
-    set_seed(cfg.seed)
+    set_seed(42)
     main()
