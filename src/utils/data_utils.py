@@ -20,7 +20,7 @@ def get_dataloaders(cfg, tokenizer):
     else:
         full = load_from_disk(path)['train']
 
-    full = full.select(range(1000))
+    #full = full.select(range(1000))
 
     splits = full.train_test_split(
         test_size=cfg.dataset.test_size,
