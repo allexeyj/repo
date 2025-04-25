@@ -48,12 +48,17 @@ def train_epoch_accelerate(accelerator, model, train_dl, optim, scheduler, memor
             # дождаться, чтобы все rank-ы были на одном шаге
             accelerator.wait_for_everyone()
             ckpt_base = cfg.training.output_dir
+            new_checkpoint_path_save = os.path.join(ckpt_base, f"step_{current_step}")
             os.makedirs(ckpt_base, exist_ok=True)
             for d in os.listdir(ckpt_base):
                 path = os.path.join(ckpt_base, d)
                 if os.path.isdir(path) and d.startswith("step_"):
                     shutil.rmtree(path, ignore_errors=True)
-            accelerator.save_state(os.path.join(ckpt_base, f"step_{current_step}"))
+            
+            accelerator.save_state(new_checkpoint_path_save)
+            accelerator.print(f"Checkpoint сохранён: {new_checkpoint_path_save}")
+
+            
 
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
