@@ -27,9 +27,10 @@ def main(cfg: DictConfig):
 
     accelerator = Accelerator(
         log_with="wandb",
-        project_dir=cfg.training.output_dir,
-        dataloader_config=DataLoaderConfiguration(split_batches=True, dispatch_batches=True)
-    )
+        project_dir=cfg.training.output_dir)
+
+    accelerator.state.deepspeed_plugin.deepspeed_config['train_micro_batch_size_per_gpu'] = cfg.batch.batch_size
+    accelerator.state.deepspeed_plugin.deepspeed_config['gradient_accumulation_steps'] = 1
 
     # ─── 1.1) Инициализируем трекеры (имя run, параметры эксперимента)
     if accelerator.is_main_process:
