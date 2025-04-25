@@ -8,11 +8,6 @@ from src.implementations.triplet_collator import TripletCollator
 from src.implementations.stratified_batch_sampler import StratifiedBatchSampler
 
 
-def seed_worker(worker_id: int):
-    worker_seed = torch.initial_seed() % 2 ** 32
-    np.random.seed(worker_seed)
-    random.seed(worker_seed)
-
 
 def get_dataloaders(cfg, tokenizer):
     # Загрузка датасета: либо по имени на HF Hub, либо из локальной папки
@@ -24,6 +19,8 @@ def get_dataloaders(cfg, tokenizer):
         full = load_dataset(name, split="train")
     else:
         full = load_from_disk(path)['train']
+
+    full = full[:1000]
 
     splits = full.train_test_split(
         test_size=cfg.dataset.test_size,
@@ -37,14 +34,11 @@ def get_dataloaders(cfg, tokenizer):
     sampler = StratifiedBatchSampler(train_ids, cfg.batch.batch_size, drop_last=False)
 
 
-    g = torch.Generator().manual_seed(cfg.seed)
 
     train_dl = DataLoader(
         train_ds,
         batch_sampler=sampler,
         collate_fn=collator,
-        worker_init_fn=seed_worker,
-        generator=g,
         pin_memory=True,
         prefetch_factor=2,
         num_workers=1
@@ -54,8 +48,6 @@ def get_dataloaders(cfg, tokenizer):
         batch_size=cfg.batch.batch_size,
         shuffle=False,
         collate_fn=collator,
-        worker_init_fn=seed_worker,
-        generator=g,
         pin_memory=True,
         prefetch_factor=2,
         num_workers=1
