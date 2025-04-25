@@ -68,7 +68,7 @@ def main(cfg: DictConfig):
 
     for epoch in range(1, cfg.training.epochs + 1):
         train_loss = train_epoch_accelerate(
-            accelerator, model, train_dl, optim, scheduler, memory, cfg, epoch
+            accelerator, model,tokenizer, train_dl, optim, scheduler, memory, cfg, epoch
         )
         val_loss = validate_epoch_accelerate(
             accelerator, model, val_dl, cfg, epoch
