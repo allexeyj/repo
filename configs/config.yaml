@@ -13,7 +13,7 @@ batch:
   ref_size: 384
 
 training:
-  epochs: 1
+  epochs: 2
   lr: 1e-5
   weight_decay: 0.01
   temperature: 0.02
