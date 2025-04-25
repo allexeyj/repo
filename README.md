@@ -72,8 +72,13 @@
 
 
 Запуск обучения с accelerate:
-```bash
-accelerate launch train_accelerate.py
+```python
+import os
+os.environ['WANDB_API_KEY'] = '<key>'
+
+!accelerate launch \
+  --config_file configs/accelerate/default_config.yaml \
+  train_accelerate.py
 ```
 
 
