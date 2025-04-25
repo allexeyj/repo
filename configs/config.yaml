@@ -8,7 +8,7 @@ seed: 42
 device: ${env:DEVICE,cuda}
 
 batch:
-  batch_size: 26
+  batch_size: 28
   num_hard_negs: 5
   ref_size: 256
 
@@ -17,7 +17,7 @@ training:
   lr: 1e-5
   weight_decay: 0.01
   temperature: 0.02
-  ckpt_steps: 20000
+  ckpt_steps: 2000
   output_dir: checkpoints
 
 wandb:
