@@ -45,7 +45,9 @@ def get_dataloaders(cfg, tokenizer):
         collate_fn=collator,
         worker_init_fn=seed_worker,
         generator=g,
-        pin_memory=True
+        pin_memory=True,
+        prefetch_factor=2,
+        num_workers=1
     )
     val_dl = DataLoader(
         val_ds,
@@ -54,7 +56,9 @@ def get_dataloaders(cfg, tokenizer):
         collate_fn=collator,
         worker_init_fn=seed_worker,
         generator=g,
-        pin_memory=True
+        pin_memory=True,
+        prefetch_factor=2,
+        num_workers=1
     )
 
     return train_dl, val_dl
