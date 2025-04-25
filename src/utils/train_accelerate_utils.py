@@ -4,6 +4,7 @@ import shutil
 from tqdm.auto import tqdm
 from src.utils.loss_utils import info_nce_loss
 
+
 def train_epoch_accelerate(accelerator, model, train_dl, optim, scheduler, memory, cfg, epoch_idx):
     model.train()
     total_loss = 0.0
@@ -20,7 +21,7 @@ def train_epoch_accelerate(accelerator, model, train_dl, optim, scheduler, memor
             mask[0::stride] = mask[1::stride] = False
             batch_negs = embs[mask]
 
-            all_negs = accelerator.gather(batch_negs).detach() #чтобы CrossBatchMemory делился  между GPU
+            all_negs = accelerator.gather(batch_negs).detach()  # чтобы CrossBatchMemory делился  между GPU
             memory.enqueue(all_negs)
 
             loss = info_nce_loss(
@@ -43,24 +44,27 @@ def train_epoch_accelerate(accelerator, model, train_dl, optim, scheduler, memor
         if cfg.wandb.use_wandb and accelerator.is_main_process:
             accelerator.log({"train_loss": loss.item()}, step=current_step)
 
-
-        if accelerator.is_main_process and cfg.training.ckpt_steps and current_step % cfg.training.ckpt_steps == 0 and current_step >= cfg.training.ckpt_steps:
-            # дождаться, чтобы все rank-ы были на одном шаге
-            print('stuck here')
+        if cfg.training.ckpt_steps and current_step >= cfg.training.ckpt_steps \
+                and current_step % cfg.training.ckpt_steps == 0:
             accelerator.wait_for_everyone()
-            print('this will not display')
             ckpt_base = cfg.training.output_dir
-            new_checkpoint_path_save = os.path.join(ckpt_base, f"step_{current_step}")
-            os.makedirs(ckpt_base, exist_ok=True)
-            for d in os.listdir(ckpt_base):
-                path = os.path.join(ckpt_base, d)
-                if os.path.isdir(path) and d.startswith("step_"):
-                    shutil.rmtree(path, ignore_errors=True)
-            
-            accelerator.save_state(new_checkpoint_path_save)
-            accelerator.print(f"Checkpoint сохранён: {new_checkpoint_path_save}")
+            new_ckpt = os.path.join(ckpt_base, f"step_{current_step}")
 
-            
+            if accelerator.is_main_process:
+                os.makedirs(ckpt_base, exist_ok=True)
+                for d in os.listdir(ckpt_base):
+                    if d.startswith("step_"):
+                        shutil.rmtree(os.path.join(ckpt_base, d), ignore_errors=True)
+                os.makedirs(new_ckpt, exist_ok=True)
+
+            accelerator.wait_for_everyone()
+
+            accelerator.save_state(new_ckpt)
+
+            accelerator.wait_for_everyone()
+
+            if accelerator.is_main_process:
+                accelerator.print(f"Checkpoint сохранён: {new_ckpt}")
 
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
