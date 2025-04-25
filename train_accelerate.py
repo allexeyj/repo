@@ -15,16 +15,19 @@ from src.utils.model_utils import build_tokenizer_and_model, get_optim_and_sched
 from src.implementations.cross_batch_memory import CrossBatchMemory
 from src.utils.train_accelerate_utils import train_epoch_accelerate, validate_epoch_accelerate
 
+def set_seed(seed: int) -> None:
+    """Set the seed for reproducibility."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
 
 @hydra.main(config_path="configs", config_name="config")
 def main(cfg: DictConfig):
-    # ─── 0) До всякой инициализации torch — фиксируем hash-seed и cublas workspace
-    os.environ["PYTHONHASHSEED"] = str(cfg.seed)
-    os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
-    random.seed(cfg.seed)
-
-    # ─── 1) Создаём Accelerator с интеграцией WandB
-
     accelerator = Accelerator(
         log_with="wandb",
         project_dir=cfg.training.output_dir)
@@ -38,12 +41,6 @@ def main(cfg: DictConfig):
             project_name=cfg.wandb.project,  # уникальное имя запуска
             config=OmegaConf.to_container(cfg, resolve=False)
         )
-
-    # ─── 2) Сиды и детерминизм
-    set_seed(cfg.seed, device_specific=True)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-    torch.use_deterministic_algorithms(True, warn_only=True)
 
     # ─── 3) Строим токенизатор и модель
     tokenizer, model = build_tokenizer_and_model(cfg)
@@ -62,17 +59,10 @@ def main(cfg: DictConfig):
     accelerator.print(f"INFO: CrossBatchMemory queue size per process = {queue_size}")
     memory = CrossBatchMemory(int(queue_size), cfg.model.hidden_dim, accelerator.device)
 
-    # ─── 7) Регистрируем stateful-объекты для корректного сохранения/загрузки
-    accelerator.register_for_checkpointing(train_dl.batch_sampler)
-    accelerator.register_for_checkpointing(memory)
-
     # ─── 8) Готовим всё к распараллеливанию
     model, optim, train_dl, val_dl, scheduler = accelerator.prepare(
         model, optim, train_dl, val_dl, scheduler
     )
-
-    if cfg.resume_from:
-        accelerator.load_state(cfg.resume_from)
 
     # 9) Цикл обучения и валидации через вынесенные функции
 
@@ -93,4 +83,5 @@ def main(cfg: DictConfig):
 
 
 if __name__ == "__main__":
+    set_seed(cfg.seed)
     main()

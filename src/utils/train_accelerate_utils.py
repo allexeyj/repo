@@ -44,28 +44,6 @@ def train_epoch_accelerate(accelerator, model, train_dl, optim, scheduler, memor
         if cfg.wandb.use_wandb and accelerator.is_main_process:
             accelerator.log({"train_loss": loss.item()}, step=current_step)
 
-        if cfg.training.ckpt_steps and current_step >= cfg.training.ckpt_steps \
-                and current_step % cfg.training.ckpt_steps == 0:
-            accelerator.wait_for_everyone()
-            ckpt_base = cfg.training.output_dir
-            new_ckpt = os.path.join(ckpt_base, f"step_{current_step}")
-
-            if accelerator.is_main_process:
-                os.makedirs(ckpt_base, exist_ok=True)
-                for d in os.listdir(ckpt_base):
-                    if d.startswith("step_"):
-                        shutil.rmtree(os.path.join(ckpt_base, d), ignore_errors=True)
-                os.makedirs(new_ckpt, exist_ok=True)
-
-            accelerator.wait_for_everyone()
-
-            accelerator.save_state(new_ckpt)
-
-            accelerator.wait_for_everyone()
-
-            if accelerator.is_main_process:
-                accelerator.print(f"Checkpoint сохранён: {new_ckpt}")
-
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
         unwrapped_model = accelerator.unwrap_model(model)

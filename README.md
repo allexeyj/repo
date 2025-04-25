@@ -68,7 +68,7 @@
    - `compute_environment`, `distributed_type`, `mixed_precision`, `num_processes`, `gpu_ids`, `deepspeed_config` и др.
 4. **configs/config.yaml**:
    - подключает нужные модели и датасеты через `defaults`
-   - задаёт `seed`, `device`, параметры `batch`, `training`, `wandb`, `resume_from`
+   - задаёт `seed`, `device`, параметры `batch`, `training`, `wandb`
 
 
 Запуск обучения с accelerate:

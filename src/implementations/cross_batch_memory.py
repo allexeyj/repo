@@ -19,12 +19,3 @@ class CrossBatchMemory:
         if len(self.embeddings) == 0:
             return torch.empty(0, self.dim, device=self.device)
         return torch.stack(tuple(self.embeddings))
-    def state_dict(self):
-        if not self.embeddings:
-            return {"embeddings": torch.empty(0, self.dim)}
-        return {"embeddings": torch.stack(tuple(self.embeddings)).cpu()}
-
-    def load_state_dict(self, state):
-        self.embeddings.clear()
-        for e in state["embeddings"]:
-            self.embeddings.append(e.to(self.device))
