@@ -31,7 +31,7 @@ def get_dataloaders(cfg, tokenizer):
 
     collator = TripletCollator(tokenizer, cfg.model.max_len)
     train_ids = train_ds["dataset_name"]
-    sampler = StratifiedBatchSampler(train_ids, cfg.batch.batch_size, drop_last=False)
+    sampler = StratifiedBatchSampler(train_ids, cfg.batch.batch_size, drop_last=False) #drop_last по сути всегда True, что бы не стояло
 
 
 
