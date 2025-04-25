@@ -46,7 +46,9 @@ def train_epoch_accelerate(accelerator, model, train_dl, optim, scheduler, memor
 
         if accelerator.is_main_process and cfg.training.ckpt_steps and current_step % cfg.training.ckpt_steps == 0 and current_step >= cfg.training.ckpt_steps:
             # дождаться, чтобы все rank-ы были на одном шаге
+            print('stuck here')
             accelerator.wait_for_everyone()
+            print('this will not display')
             ckpt_base = cfg.training.output_dir
             new_checkpoint_path_save = os.path.join(ckpt_base, f"step_{current_step}")
             os.makedirs(ckpt_base, exist_ok=True)
