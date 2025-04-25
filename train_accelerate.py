@@ -87,6 +87,10 @@ def main(cfg: DictConfig):
         if accelerator.is_main_process:
             print(f"Epoch {epoch}: train_loss={train_loss:.4f}, val_loss={val_loss:.4f}")
 
+    accelerator.wait_for_everyone()  # Дождаться всех процессов перед завершением
+    if accelerator.is_main_process:
+        accelerator.end_training()
+
 
 if __name__ == "__main__":
     main()
