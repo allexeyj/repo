@@ -3,16 +3,13 @@ import os
 import shutil
 from tqdm.auto import tqdm
 from src.utils.loss_utils import info_nce_loss
-from accelerate import Accelerator
 
 
-def train_epoch_accelerate(accelerator: Accelerator, model, train_dl, optim, scheduler, memory, cfg, epoch_idx):
+def train_epoch_accelerate(accelerator, model, train_dl, optim, scheduler, memory, cfg, epoch_idx):
     model.train()
     total_loss = 0.0
     base_step = (epoch_idx - 1) * len(train_dl)
-    bar = accelerator.progress_bar(train_dl, desc=f"Epoch {epoch_idx}/{cfg.training.epochs} [train]")
-    
-    for step, batch in enumerate(bar):
+    for step, batch in enumerate(tqdm(train_dl, desc=f"Epoch {epoch_idx}/{cfg.training.epochs} [train]")):
         with accelerator.accumulate(model):
             with accelerator.autocast():
                 embs = model(**batch).last_hidden_state[:, 0, :]
@@ -57,12 +54,11 @@ def train_epoch_accelerate(accelerator: Accelerator, model, train_dl, optim, sch
     return total_loss / len(train_dl)
 
 
-def validate_epoch_accelerate(accelerator: Accelerator, model, val_dl, cfg, epoch_idx):
+def validate_epoch_accelerate(accelerator, model, val_dl, cfg, epoch_idx):
     model.eval()
     val_loss = 0.0
     with torch.no_grad():
-        bar = accelerator.progress_bar(val_dl, desc=f"Epoch {epoch_idx}/{cfg.training.epochs} [val]")
-        for batch in bar:
+        for batch in tqdm(val_dl, desc=f"Epoch {epoch_idx}/{cfg.training.epochs} [val]"):
             with accelerator.autocast():
                 embs = model(**batch).last_hidden_state[:, 0, :]
 
