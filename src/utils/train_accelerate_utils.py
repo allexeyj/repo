@@ -46,11 +46,14 @@ def train_epoch_accelerate(accelerator, model, train_dl, optim, scheduler, memor
 
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
+        epoch_dir = os.path.join(cfg.training.output_dir, f"epoch_{epoch_idx}")
         unwrapped_model = accelerator.unwrap_model(model)
         unwrapped_model.save_pretrained(
-            cfg.training.output_dir,
+            epoch_dir,
             save_function=accelerator.save
         )
+        tokenizer.save_pretrained(epoch_dir)
+        accelerator.print(f"Model saved to {epoch_dir}")
     return total_loss / len(train_dl)
 
 
