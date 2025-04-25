@@ -8,9 +8,9 @@ seed: 42
 device: ${env:DEVICE,cuda}
 
 batch:
-  batch_size: 48
+  batch_size: 64
   num_hard_negs: 5
-  ref_size: 256
+  ref_size: 512
 
 training:
   epochs: 1
