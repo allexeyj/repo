@@ -5,7 +5,7 @@ from tqdm.auto import tqdm
 from src.utils.loss_utils import info_nce_loss
 
 
-def train_epoch_accelerate(accelerator, model, train_dl, optim, scheduler, memory, cfg, epoch_idx):
+def train_epoch_accelerate(accelerator, model, tokenizer, train_dl, optim, scheduler, memory, cfg, epoch_idx):
     model.train()
     total_loss = 0.0
     base_step = (epoch_idx - 1) * len(train_dl)
