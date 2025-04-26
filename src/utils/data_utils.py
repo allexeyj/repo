@@ -42,7 +42,7 @@ def get_dataloaders(cfg, tokenizer):
             collate_fn=collator,
             pin_memory=True,
             prefetch_factor=cfg.batch.prefetch_factor,
-            num_workers=cfg.batch.num_worker
+            num_workers=cfg.batch.num_workers
         )
         print('custom sampler')
     else:
@@ -53,7 +53,7 @@ def get_dataloaders(cfg, tokenizer):
             collate_fn=collator,
             pin_memory=True,
             prefetch_factor=cfg.batch.prefetch_factor,
-            num_workers=cfg.batch.num_worker,
+            num_workers=cfg.batch.num_workers,
             drop_last=cfg.batch.drop_last
         )
     val_dl = DataLoader(
