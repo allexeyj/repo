@@ -48,6 +48,7 @@ def get_dataloaders(cfg, tokenizer):
     else:
         train_dl = DataLoader(
             train_ds,
+            batch_size=cfg.batch.batch_size,
             shuffle=True,
             collate_fn=collator,
             pin_memory=True,
