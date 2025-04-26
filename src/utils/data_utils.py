@@ -20,7 +20,6 @@ def get_dataloaders(cfg, tokenizer):
     else:
         full = load_from_disk(path)['train']
 
-    full = full.select(range(1000))
 
     splits = full.train_test_split(
         test_size=cfg.dataset.test_size,
@@ -62,8 +61,8 @@ def get_dataloaders(cfg, tokenizer):
         collate_fn=collator,
         pin_memory=True,
         prefetch_factor=cfg.batch.prefetch_factor,
-        num_workers=cfg.batch.num_workers
-        #drop_last=cfg.batch.drop_last
+        num_workers=cfg.batch.num_workers,
+        drop_last=cfg.batch.drop_last #ошибка с true, если тестируем с full = full.select(range(1000)) так как test_size = 0.02
 
     )
 
