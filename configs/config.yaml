@@ -11,6 +11,10 @@ batch:
   batch_size: 48
   num_hard_negs: 5
   ref_size: 384
+  use_stratified_batch_sampler: true
+  drop_last: true
+  prefetch_factor: 2
+  num_workers: 1
 
 training:
   epochs: 2

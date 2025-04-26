@@ -8,21 +8,18 @@ class StratifiedBatchSampler(Sampler[List[int]]):
     Формирует батчи так, чтобы внутри каждого batch_size
     все примеры были из одного источника (dataset_id).
 
-    Сделано на основе статьи:
-    в которой device-батчи формируются из одного датасета,
+    device-батчи формируются из одного датасета,
     а затем объединяются в глобальный батч. Это улучшает
     разнообразие источников и предотвращает утечку hard-негативов.
     """
 
-    def __init__(self, dataset_ids: List[int], batch_size: int, drop_last: bool = False):
+    def __init__(self, dataset_ids: List[int], batch_size: int): #drop_last по сути всегда True
         """
         Args:
             dataset_ids (List[int]): список длины N, где dataset_ids[i] — id датасета для i-го примера
             batch_size (int): размер каждого device-батча
-            drop_last (bool): опустить последний неполный батч (на уровне всей эпохи)
         """
         self.batch_size = batch_size
-        self.drop_last = drop_last
 
         # Группируем индексы по id датасета
         self.groups = {}

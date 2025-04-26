@@ -1,7 +1,13 @@
 import torch
 from collections import deque
 
+
 class CrossBatchMemory:
+    '''
+    очередь эмбеддингов предыдущих негативов для более стабильного InfoNCE
+    нужен большой батч, а большой батч наши видеокарты не тянут, очередь "симулирует" большой батч.
+    '''
+
     def __init__(self, max_size: int, dim: int, device: str):
         self.max_size = max_size
         self.device = device
@@ -15,7 +21,7 @@ class CrossBatchMemory:
                 self.embeddings.popleft()
             self.embeddings.append(e)
 
-    def get(self)  -> torch.Tensor:
+    def get(self) -> torch.Tensor:
         if len(self.embeddings) == 0:
             return torch.empty(0, self.dim, device=self.device)
         return torch.stack(tuple(self.embeddings))

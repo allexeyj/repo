@@ -20,7 +20,7 @@ def get_dataloaders(cfg, tokenizer):
     else:
         full = load_from_disk(path)['train']
 
-    #full = full.select(range(1000))
+    full = full.select(range(1000))
 
     splits = full.train_test_split(
         test_size=cfg.dataset.test_size,
@@ -31,26 +31,40 @@ def get_dataloaders(cfg, tokenizer):
 
     collator = TripletCollator(tokenizer, cfg.model.max_len)
     train_ids = train_ds["dataset_name"]
-    sampler = StratifiedBatchSampler(train_ids, cfg.batch.batch_size, drop_last=False) #drop_last по сути всегда True, что бы не стояло
 
 
 
-    train_dl = DataLoader(
-        train_ds,
-        batch_sampler=sampler,
-        collate_fn=collator,
-        pin_memory=True,
-        prefetch_factor=2,
-        num_workers=1
-    )
+    if cfg.batch.use_stratified_batch_sampler:
+        sampler = StratifiedBatchSampler(train_ids, cfg.batch.batch_size)  # drop_last по сути всегда True
+        train_dl = DataLoader(
+            train_ds,
+            batch_sampler=sampler,
+            collate_fn=collator,
+            pin_memory=True,
+            prefetch_factor=cfg.batch.prefetch_factor,
+            num_workers=cfg.batch.num_worker
+        )
+        print('custom sampler')
+    else:
+        train_dl = DataLoader(
+            train_ds,
+            shuffle=True,
+            collate_fn=collator,
+            pin_memory=True,
+            prefetch_factor=cfg.batch.prefetch_factor,
+            num_workers=cfg.batch.num_worker,
+            drop_last=cfg.batch.drop_last
+        )
     val_dl = DataLoader(
         val_ds,
         batch_size=cfg.batch.batch_size,
         shuffle=False,
         collate_fn=collator,
         pin_memory=True,
-        prefetch_factor=2,
-        num_workers=1
+        prefetch_factor=cfg.batch.prefetch_factor,
+        num_workers=cfg.batch.num_workers,
+        drop_last=cfg.batch.drop_last
+
     )
 
     return train_dl, val_dl
