@@ -44,7 +44,6 @@ def get_dataloaders(cfg, tokenizer):
             prefetch_factor=cfg.batch.prefetch_factor,
             num_workers=cfg.batch.num_workers
         )
-        print('custom sampler')
     else:
         train_dl = DataLoader(
             train_ds,
@@ -63,8 +62,8 @@ def get_dataloaders(cfg, tokenizer):
         collate_fn=collator,
         pin_memory=True,
         prefetch_factor=cfg.batch.prefetch_factor,
-        num_workers=cfg.batch.num_workers,
-        drop_last=cfg.batch.drop_last
+        num_workers=cfg.batch.num_workers
+        #drop_last=cfg.batch.drop_last
 
     )
 
