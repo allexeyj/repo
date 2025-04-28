@@ -23,13 +23,13 @@ def get_dataloaders(cfg, tokenizer):
 
     splits = full.train_test_split(
         test_size=cfg.dataset.test_size,
-        stratify_by_column="dataset_name",
+        stratify_by_column="dataset_name_id",
         seed=cfg.seed,
     )
     train_ds, val_ds = splits["train"], splits["test"]
 
     collator = TripletCollator(tokenizer, cfg.model.max_len)
-    train_ids = train_ds["dataset_name"]
+    train_ids = train_ds["dataset_name_id"]
 
 
 
