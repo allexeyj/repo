@@ -11,7 +11,7 @@ batch:
   batch_size: 42
   num_hard_negs: 5
   ref_size: 384
-  use_stratified_batch_sampler: false
+  use_stratified_batch_sampler: true
   drop_last: true
   prefetch_factor: 2
   num_workers: 1
