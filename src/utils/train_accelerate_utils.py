@@ -45,9 +45,8 @@ def train_epoch_accelerate(accelerator, model, tokenizer, train_dl, optim, sched
             accelerator.log({"train_loss": loss.item()}, step=current_step)
 
             sampler = train_dl.batch_sampler
-            if hasattr(sampler, "current_group_id") and sampler.current_group_id is not None:
-                key = f"train_loss/dataset_{sampler.current_group_id}"
-                accelerator.log({ key: loss.item() }, step=current_step)
+            key = f"train_loss/dataset_{sampler.current_group_id}"
+            accelerator.log({ key: loss.item() }, step=current_step)
 
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
