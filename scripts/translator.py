@@ -55,7 +55,7 @@ from huggingface_hub import Repository
 # --------------------------------------------------------------------- #
 #                         КОНСТАНТЫ                                     #
 # --------------------------------------------------------------------- #
-HF_TOKEN   = "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"
+HF_TOKEN = os.environ["HF_TOKEN"] 
 MODEL_NAME = "facebook/nllb-200-3.3B"
 SRC_LANG   = "eng_Latn"
 TGT_LANG   = "rus_Cyrl"
