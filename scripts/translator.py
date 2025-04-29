@@ -133,7 +133,7 @@ def main():
     parser.add_argument("--batch-txt",   type=int, required=True)
     parser.add_argument("--push-every",  type=int, default=10_000,
                         help="Сколько переведённых примеров держать в буфере "
-                             "перед пушем (по умолчанию 10 000).")
+                             "перед пушем (по умолчанию 10 000).", required=True)
     parser.add_argument("--push-to",     type=str, required=True,
                         help="huggingface repo, e.g. username/my_dataset")
     parser.add_argument("--device",      type=str, required=True,
