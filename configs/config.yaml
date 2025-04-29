@@ -24,7 +24,7 @@ training:
   output_dir: saved_model
 
 wandb:
-  project: ru-en-embedder-finetune-symm
+  project: ru-en-embedder-finetune-symm-loss-ids
   api_key: null #если есть ключ, ставится в os.environ, если же null, предпологается, что уже стоит в os.environ
   use_wandb: true
 
