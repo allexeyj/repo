@@ -31,6 +31,8 @@ class StratifiedBatchSampler(Sampler[List[int]]):
         self.group_ids = list(self.groups.keys())
         self.probs = sizes / sizes.sum()
 
+        self.current_group_id: int = None
+
     def __iter__(self):
         # 1) Общее число батчей в эпохе
         n_batches = len(self)
@@ -44,6 +46,9 @@ class StratifiedBatchSampler(Sampler[List[int]]):
         for _ in range(n_batches):
             # Выбираем группу по распределению
             ds = random.choices(self.group_ids, weights=self.probs, k=1)[0]
+
+            self.current_group_id = ds
+            
             buf = buffers[ds]
 
             # Если осталось меньше batch_size, рефилл и перемешивание
