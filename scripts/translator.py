@@ -221,7 +221,7 @@ def main():
 
         # --- перевод ---
         # raw_batch – объект Dataset; приведём к dict-of-lists
-        raw_dict = raw_batch.to_dict()
+        raw_dict = raw_batch
         tr = safe_translate_batch(raw_dict, translator, args.batch_txt)
 
         # --- склеиваем перевод + дополнительные колонки ---
