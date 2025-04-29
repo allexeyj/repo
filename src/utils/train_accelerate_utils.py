@@ -44,6 +44,11 @@ def train_epoch_accelerate(accelerator, model, tokenizer, train_dl, optim, sched
         if cfg.wandb.use_wandb and accelerator.is_main_process:
             accelerator.log({"train_loss": loss.item()}, step=current_step)
 
+            sampler = train_dl.batch_sampler
+            if hasattr(sampler, "current_group_id") and sampler.current_group_id is not None:
+                key = f"train_loss/dataset_{sampler.current_group_id}"
+                accelerator.log({ key: loss.item() }, step=current_step)
+
     accelerator.wait_for_everyone()
     if accelerator.is_main_process:
         epoch_dir = os.path.join(cfg.training.output_dir, f"epoch_{epoch_idx}")
