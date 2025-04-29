@@ -233,6 +233,7 @@ def main():
                 query    = tr["query"][j],
                 positive = tr["positive"][j],
                 negative = tr["negative"][j],
+                orig_idx = start + i + j,   # ← глобальный индекс
             )
             buffer.append(rec)
 
