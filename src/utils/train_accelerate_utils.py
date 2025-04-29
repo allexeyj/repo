@@ -44,8 +44,7 @@ def train_epoch_accelerate(accelerator, model, tokenizer, train_dl, optim, sched
         if cfg.wandb.use_wandb and accelerator.is_main_process:
             accelerator.log({"train_loss": loss.item()}, step=current_step)
 
-            sampler = train_dl.batch_sampler
-            key = f"train_loss/dataset_{sampler.current_group_id}"
+            key = f"train_loss/dataset_{train_dl.batch_sampler.batch_sampler.current_group_id}"
             accelerator.log({ key: loss.item() }, step=current_step)
 
     accelerator.wait_for_everyone()
