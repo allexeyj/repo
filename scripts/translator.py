@@ -168,7 +168,6 @@ def main():
         tgt_lang=TGT_LANG,
         batch_size=args.batch_txt,
         max_length=1024,
-        device=device_idx,
     )
 
     # ----------------------------------------------------------------- #
