@@ -8,13 +8,13 @@ seed: 42
 device: ${env:DEVICE,cuda}
 
 batch:
-  batch_size: 42
+  batch_size: 128
   num_hard_negs: 5
-  ref_size: 384
+  ref_size: 1024
   use_stratified_batch_sampler: false
   drop_last: true
-  prefetch_factor: 2
-  num_workers: 1
+  prefetch_factor: 4
+  num_workers: 24
 
 training:
   epochs: 2
