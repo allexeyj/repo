@@ -1,6 +1,6 @@
 compute_environment: LOCAL_MACHINE
 distributed_type: DEEPSPEED
-mixed_precision: fp16          # позже можно поменять на bf16
+mixed_precision: bf16          # fp16 или bf16
 num_processes: 2
 gpu_ids: 0,1
 machine_rank: 0
